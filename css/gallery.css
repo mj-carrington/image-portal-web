@@ -1,0 +1,40 @@
+/* First the Grid */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-column-gap: 1px;
+    grid-row-gap: 1px;
+    justify-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* The Picture Frame */
+.gallery-frame {
+    padding: .5rem;
+    font-size: 1.2rem;
+    text-align: center;
+    background-color: #013636;
+    color: #d9d9d9;
+    border-radius: 25px;
+    /*height: 300px;*/
+    /*width: 300px;*/
+}
+
+/* The Images */
+.gallery-img {
+    /*max-width: 100%;*/
+    /*height: 300px;*/
+    height: 250px;
+    width: 250px;
+    /*max-height: 100%;*/
+    /*max-width: 30%;*/
+    /*height: auto;*/
+    object-fit: scale-down;
+    transition: opacity 0.25s ease-in-out;
+    border-radius: 25px;
+}
+
+.gallery-img:hover {
+    opacity: .7;
+}
