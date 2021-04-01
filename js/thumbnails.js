@@ -1,13 +1,14 @@
-const _apiHost = 'http://localhost:8080/mcarrington1/portal/1.0.0/album/';
+const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
+const _apiAlbum = _apiHostBase + 'album/';
+const _apiUpload = _apiHostBase + 'upload/';
 
 let albumId = location.search.substring(1);
 
 // On-Load Operations
-window.onload = function loadAlbumList() {
+window.onload = function loadView() {
     // Load our handling for form submits
-/*    const exampleForm = document.getElementById("example-form");
-    exampleForm.addEventListener("submit", handleFormSubmit);*/
-
+    const uploadForm = document.getElementById("upload-form");
+    uploadForm.addEventListener("submit", handleFormSubmit);
     // load album data
     loadAlbumInfo();
     // Load our image list
@@ -15,7 +16,7 @@ window.onload = function loadAlbumList() {
 }
 
 function loadAlbumInfo() {
-    fetch(_apiHost + albumId)
+    fetch(_apiAlbum + albumId)
         .then(response => response.json())
         .then((data) => {
             console.dir(data);
@@ -36,7 +37,7 @@ function loadAlbumInfo() {
 }
 
 function loadImages() {
-    fetch(_apiHost + albumId + '/images/')
+    fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
         .then((data) => {
             let output = '';
@@ -59,7 +60,7 @@ function loadImages() {
         });
 }
 
-async function postFormDataAsJson({ url, fileInput }) {
+async function postFormDataAsFile({ url, formData }) {
     // const plainFormData = Object.fromEntries(formData.entries());
 
     // formData.append('file', fileInput.files[0]);
@@ -67,18 +68,80 @@ async function postFormDataAsJson({ url, fileInput }) {
 
     // const formDataJsonString = JSON.stringify(plainFormData);
 
+    let fileInput = formData.get('file');
+
     const fetchOptions = {
         method: "POST",
-        body: fileInput.files[0],
+        body: formData,
     };
 
     console.log('Uploading image!');
-    const response = await fetch(url, fetchOptions);
+    const response = await fetch(_apiUpload, fetchOptions);
 
     if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
     }
+
+    return response.text();
+}
+
+async function handleFormSubmit(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const url = form.action; // TODO: Put the REST URL HERE
+
+    // Grab the file name before uploading
+    let fileInput = document.getElementById('image');
+    let filename = fileInput.files[0].name;
+
+    try {
+        const formData = new FormData(form);
+        for (var pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+        }
+        const responseData = await postFormDataAsFile({ url, formData });
+        // console.log(responseData.text());
+
+        console.log(responseData);
+
+        // now post to the API
+        await addNewImageMetaData(filename, responseData)
+
+    } catch (error) {
+        console.error(error);
+    }
+    // Close Modal
+    $('#addImageModal').modal('hide');
+
+    // Refresh List
+    loadImages();
+}
+
+async function addNewImageMetaData(imageName, imageUrl) {
+    const fetchOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: JSON.stringify({name: imageName, location: imageUrl}),
+    };
+
+
+    console.dir(fetchOptions);
+    const response = await fetch(_apiAlbum + albumId + "/image/", fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+    }
+}
+
+function convertImageUrlToName(imageUrl) {
+
+}
 
 /*    // Close Modal
     $('#myModal').modal('hide');
@@ -87,7 +150,6 @@ async function postFormDataAsJson({ url, fileInput }) {
     loadAlbums();*/
 
     // return response.json();
-}
 /*
 * Rest Client Steps to Upload / Add Photos
 * 1. take the form data from the submit button

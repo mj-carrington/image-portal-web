@@ -53,7 +53,7 @@ function generateAlbumThumbnail(album) {
     // look and see if album has a single image
     if(album.images === null) {
         console.log('no image available to populate cover, defaulting to template image')
-        return './images/album-default-cover.png' // TODO: Change this image
+        return './images/album-default-cover.png'
     } else {
         return album.images[0].location
     }
@@ -114,7 +114,7 @@ async function handleFormSubmit(event) {
         const formData = new FormData(form);
         const responseData = await postFormDataAsJson({ url, formData });
 
-        console.log({ responseData });
+        console.log(responseData);
     } catch (error) {
         console.error(error);
     }
