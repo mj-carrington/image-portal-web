@@ -1,0 +1,102 @@
+body {
+    font-family: "Merriweather Sans", sans-serif;
+    color: black;
+}
+
+.fa-gradient {
+    background: -webkit-gradient(linear, left top, left bottom, from(black), to(teal));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1E392A;
+}
+
+h2 {
+    font-size: 20px;
+    color: #3CC47C;
+}
+
+h3 {
+    font-size: 16px;
+    color:#828081
+}
+
+button {
+    background-color: #3CC47C;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+}
+
+.inputLabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1E392A;
+}
+
+input.inputField {
+    padding: 5px;
+    border: 1px solid #3CC47C;
+}
+
+div.box {
+    height: 100px;
+    width: 100px;
+    display: inline-block;
+    margin: 0 10px 0 10px;
+}
+
+#primary1 {
+    background-color: #3CC47C;
+}
+
+#primary2 {
+    background-color: #1E392A;
+}
+
+#primary3 {
+    background-color: #828081;
+}
+
+.warning {
+    background-color: #b5c730;
+    font-weight: bold;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.danger {
+    background-color: #c44c3c;
+    font-weight: bold;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.success {
+    background-color: #46c92f;
+    font-weight: bold;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+svg.svg-inline--fa {
+    color: white;
+}
+
+.spacer {
+    margin-top: 25px;
+}
+
+#footer {
+    border-top: 1px solid #dddddd;
+    margin-top: 50px;
+    padding: 10px;
+    text-align: center;
+}
