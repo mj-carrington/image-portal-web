@@ -1,6 +1,7 @@
-const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
+const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/';
 const _apiAlbum = _apiHostBase + 'album/';
-const _createAlbum = 'http://localhost:8080/mcarrington1/portal/1.0.0/album/';
+const _apiAlbums = _apiHostBase + 'albums/';
+
 
 // On-load Operations
 window.onload = function loadAlbumList() {
@@ -13,7 +14,7 @@ window.onload = function loadAlbumList() {
 }
 
 function loadAlbumListDebug() {
-    fetch(_apiHost)
+    fetch(_apiAlbums)
         .then(response => response.json())
         .then((data) => {
             console.dir(data)
@@ -25,7 +26,7 @@ function loadAlbumListDebug() {
 
 
 function loadAlbums() {
-    fetch(_apiHost)
+    fetch(_apiAlbums)
         .then(response => response.json())
         .then((data) => {
             let output = '';
@@ -34,9 +35,9 @@ function loadAlbums() {
                 let imageLocation = generateAlbumThumbnail(album)
                 output += `
                 <figure class="gallery-frame">
-                <a href="thumbnails.html?${album.id}"
+                <a href="thumbnails.html?${album.id}">
                     <img class="gallery-img" src="${imageLocation}" alt="${album.description}" title="${album.description}">
-                    </a>
+                </a>
                     <figcaption>${album.name}</figcaption>
                 </figure>
                 `;
@@ -112,7 +113,7 @@ async function handleFormSubmit(event) {
 
     try {
         const formData = new FormData(form);
-        const responseData = await postFormDataAsJson({ url, formData });
+        const responseData = await postFormDataAsJson({ formData });
 
         console.log(responseData);
     } catch (error) {
