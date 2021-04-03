@@ -44,28 +44,29 @@ function loadAlbumInfo() {
         });
 }
 
-// TODO: Handle an empty library by outputting a message instead
 function loadImageGallery() {
     fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
         .then((data) => {
             let output = '';
             console.dir(data);
+
             data.forEach(function(image) {
                 output += `
-                <figure class="gallery-frame">
-                    <a href="image.html?${image.id}">
-                        <img class="gallery-img" src="${image.location}" alt="${image.tag}" title="${image.tag}">
-                    </a>
-                    <figcaption>${image.name}</figcaption>
-                </figure>
-                `;
+            <figure class="gallery-frame">
+                <a href="image.html?${image.id}">
+                    <img class="gallery-img" src="${image.location}" alt="${image.tag}" title="${image.tag}">
+                </a>
+                <figcaption>${image.name}</figcaption>
+            </figure>
+            `;
             });
             document.getElementById('images').innerHTML = output;
 
         })
         .catch(err => {
-            console.log(err)
+            // console.log(err)
+            document.getElementById('images').innerHTML = '<h4>No Images Found.</h4>';
         });
 }
 
