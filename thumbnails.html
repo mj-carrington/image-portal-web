@@ -52,7 +52,7 @@
                 <i class="fas fa-share"></i>
                 Share Album
             </button>
-            <button type="button" class="btn btn-danger">
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteAlbumModal">
                 <i class="fas fa-trash"></i>
                 Delete Album
             </button>
@@ -135,7 +135,6 @@
                 <form id="share-album-form">
                     <div class="modal-body">
                         <div class="form-group">
-                            <!-- BUG: This name field is somehow overwriting the url or forwarding on-->
                             <input type="text" name="email" class="form-control-share" id="email"
                                    placeholder="Put e-mail address here">
                         </div>
@@ -163,13 +162,12 @@
 
                 <!-- Modal body -->
                 <form id="delete-album-form">
-                    <div class="modal-body">
+<!--                    <div class="modal-body">
                         <div class="form-group">
-                            <!-- BUG: This name field is somehow overwriting the url or forwarding on-->
                             <input type="text" name="email" class="form-control-share" id="email"
                                    placeholder="Put e-mail address here">
                         </div>
-                    </div>
+                    </div>-->
 
                     <!-- Modal footer -->
                     <div class="modal-footer">

@@ -67,6 +67,7 @@ function generateAlbumThumbnail(album) {
  * @param {FormData} options.formData - `FormData` instance
  * @return {Object} - Response body from URL that was POSTed to
  */
+// TODO: Drop URL parameter here
 async function postFormDataAsJson({ url, formData }) {
     const plainFormData = Object.fromEntries(formData.entries());
     const formDataJsonString = JSON.stringify(plainFormData);
@@ -122,39 +123,3 @@ async function handleFormSubmit(event) {
     // Refresh the View
 
 }
-
-
-// This grabs the JSON data from rest and breaks it into a table
-/*
-window.onload = function getImagesByAlbumId(albumId) {
-    fetch(_apiHost)
-        .then(response => response.json())
-        .then((data) => {
-            let output = `
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>tag</th>
-                        <th>id</th>
-                    </tr>
-            `;
-            data.forEach(function(image) {
-                output += `
-                        <tr>
-                            <td>${image.name}</td>
-                            <td>${image.location}</td>
-                            <td>${image.tag}</td>
-                            <td>${image.id}</td>
-                        </tr>
-                `;
-            });
-            output += '</table>'
-            document.getElementById('output').innerHTML = output;
-
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-*/

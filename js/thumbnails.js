@@ -15,7 +15,7 @@ window.onload = function loadView() {
     shareAlbumForm.addEventListener("submit", handleFormSubmitJson);
 
     const deleteAlbumForm = document.getElementById("delete-album-form");
-    deleteAlbumForm.addEventListener("submit", handleFormSubmitJson);
+    deleteAlbumForm.addEventListener("submit", handleFormSubmitDelete);
 
     // load album data
     loadAlbumInfo();
@@ -44,6 +44,7 @@ function loadAlbumInfo() {
         });
 }
 
+// TODO: Handle an empty library by outputting a message instead
 function loadImageGallery() {
     fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
@@ -89,7 +90,7 @@ async function retrieveImagesLocations() {
 }
 
 // Share Image to Album Functionality
-async function postFormDataAsJson({ formData }) {
+async function shareImageOperation({ formData }) {
     let images = await retrieveImagesLocations();
     let payload = {
         imageUrls: images,
@@ -120,14 +121,31 @@ async function postFormDataAsJson({ formData }) {
     $('#shareAlbumModal').modal('hide');
 
     // Refresh List
-    loadAlbums();
+    loadImageGallery();
 
     // return response.json();
 }
 
+async function deleteAlbumOperation() {
+    const fetchOptions = {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        }
+    };
+
+    const response = await fetch(_apiAlbum + albumId, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+    }
+}
+
 
 // Add Image to Album Functionality
-async function postFormDataAsFile({ formData }) {
+async function addImageToAlbumOperation({ formData }) {
     const fetchOptions = {
         method: "POST",
         body: formData,
@@ -159,7 +177,7 @@ async function handleFormSubmitFile(event) {
         for (var pair of formData.entries()) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
-        const responseData = await postFormDataAsFile({ formData });
+        const responseData = await addImageToAlbumOperation({ formData });
         // console.log(responseData.text());
 
         console.log(responseData);
@@ -187,7 +205,7 @@ async function handleFormSubmitJson(event) {
         for (var pair of formData.entries()) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
-        const responseData = await postFormDataAsJson({ formData });
+        const responseData = await shareImageOperation({ formData });
         // console.log(responseData.text());
 
         console.log(responseData);
@@ -200,6 +218,31 @@ async function handleFormSubmitJson(event) {
 
     // Refresh List
     loadImageGallery();
+}
+
+async function handleFormSubmitDelete(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+
+    try {
+        const formData = new FormData(form);
+        for (var pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+        }
+        const responseData = await deleteAlbumOperation();
+        // console.log(responseData.text());
+
+        console.log(responseData);
+
+    } catch (error) {
+        console.error(error);
+    }
+    // Close Modal
+    $('#deleteAlbumModal').modal('hide');
+
+    // Go back to the albums list
+    window.location.replace("./albums.html");
 }
 
 async function addNewImageMetaData(imageName, imageUrl) {
