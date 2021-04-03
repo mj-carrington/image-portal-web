@@ -1,18 +1,26 @@
 const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
 const _apiAlbum = _apiHostBase + 'album/';
 const _apiUpload = _apiHostBase + 'upload/';
+const _apiShare = _apiHostBase + 'share/';
 
-let albumId = location.search.substring(1);
+const albumId = location.search.substring(1);
 
 // On-Load Operations
 window.onload = function loadView() {
     // Load our handling for form submits
     const uploadForm = document.getElementById("upload-form");
-    uploadForm.addEventListener("submit", handleFormSubmit);
+    uploadForm.addEventListener("submit", handleFormSubmitFile);
+
+    const shareAlbumForm = document.getElementById("share-album-form");
+    shareAlbumForm.addEventListener("submit", handleFormSubmitJson);
+
+    const deleteAlbumForm = document.getElementById("delete-album-form");
+    deleteAlbumForm.addEventListener("submit", handleFormSubmitJson);
+
     // load album data
     loadAlbumInfo();
     // Load our image list
-    loadImages();
+    loadImageGallery();
 }
 
 function loadAlbumInfo() {
@@ -21,14 +29,14 @@ function loadAlbumInfo() {
         .then((data) => {
             console.dir(data);
 
-            let output = `
+            let albumInfo = `
             <h4>${data.name} </h4>
             </li>
             <li class="nav-item">
             Description: ${data.description}<br>
             Created: ${data.created}
             `
-            document.getElementById('album-info').innerHTML = output;
+            document.getElementById('album-info').innerHTML = albumInfo;
 
         })
         .catch(err => {
@@ -36,7 +44,7 @@ function loadAlbumInfo() {
         });
 }
 
-function loadImages() {
+function loadImageGallery() {
     fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
         .then((data) => {
@@ -60,16 +68,66 @@ function loadImages() {
         });
 }
 
-async function postFormDataAsFile({ url, formData }) {
-    // const plainFormData = Object.fromEntries(formData.entries());
 
-    // formData.append('file', fileInput.files[0]);
+async function retrieveImagesLocations() {
+    let imageArray = [];
+
+    await fetch(_apiAlbum + albumId + '/images/')
+        .then(response => response.json())
+        .then((data) => {
+            console.dir(data);
+            data.forEach(function(imageEntry) {
+                imageArray.push(imageEntry.location);
+            });
+        })
+        .catch(err => {
+            console.log(err)
+        });
+    console.dir(imageArray);
+
+    return imageArray;
+}
+
+// Share Image to Album Functionality
+async function postFormDataAsJson({ formData }) {
+    let images = await retrieveImagesLocations();
+    let payload = {
+        imageUrls: images,
+        email: formData.get('email')
+    }
+
+    const formDataJsonString = JSON.stringify(payload);
+
+    const fetchOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: formDataJsonString,
+    };
+
+    console.log("Submitting JSON ::");
+    console.dir(formDataJsonString);
+    const response = await fetch(_apiShare, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+    }
+
+    // Close Modal
+    $('#shareAlbumModal').modal('hide');
+
+    // Refresh List
+    loadAlbums();
+
+    // return response.json();
+}
 
 
-    // const formDataJsonString = JSON.stringify(plainFormData);
-
-    let fileInput = formData.get('file');
-
+// Add Image to Album Functionality
+async function postFormDataAsFile({ formData }) {
     const fetchOptions = {
         method: "POST",
         body: formData,
@@ -86,11 +144,11 @@ async function postFormDataAsFile({ url, formData }) {
     return response.text();
 }
 
-async function handleFormSubmit(event) {
+// TODO - Merge this with handleFormSubmitJson
+async function handleFormSubmitFile(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
-    const url = form.action; // TODO: Put the REST URL HERE
 
     // Grab the file name before uploading
     let fileInput = document.getElementById('image');
@@ -101,7 +159,7 @@ async function handleFormSubmit(event) {
         for (var pair of formData.entries()) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
-        const responseData = await postFormDataAsFile({ url, formData });
+        const responseData = await postFormDataAsFile({ formData });
         // console.log(responseData.text());
 
         console.log(responseData);
@@ -116,7 +174,32 @@ async function handleFormSubmit(event) {
     $('#addImageModal').modal('hide');
 
     // Refresh List
-    loadImages();
+    loadImageGallery();
+}
+
+async function handleFormSubmitJson(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+
+    try {
+        const formData = new FormData(form);
+        for (var pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+        }
+        const responseData = await postFormDataAsJson({ formData });
+        // console.log(responseData.text());
+
+        console.log(responseData);
+
+    } catch (error) {
+        console.error(error);
+    }
+    // Close Modal
+    $('#shareAlbumModal').modal('hide');
+
+    // Refresh List
+    loadImageGallery();
 }
 
 async function addNewImageMetaData(imageName, imageUrl) {
@@ -126,9 +209,8 @@ async function addNewImageMetaData(imageName, imageUrl) {
             "Content-Type": "application/json",
             Accept: "application/json",
         },
-        body: JSON.stringify({name: imageName, location: imageUrl}),
+        body: JSON.stringify({name: imageName, location: imageUrl, tag: ""}),
     };
-
 
     console.dir(fetchOptions);
     const response = await fetch(_apiAlbum + albumId + "/image/", fetchOptions);
@@ -138,98 +220,3 @@ async function addNewImageMetaData(imageName, imageUrl) {
         throw new Error(errorMessage);
     }
 }
-
-function convertImageUrlToName(imageUrl) {
-
-}
-
-/*    // Close Modal
-    $('#myModal').modal('hide');
-
-    // Refresh List
-    loadAlbums();*/
-
-    // return response.json();
-/*
-* Rest Client Steps to Upload / Add Photos
-* 1. take the form data from the submit button
-* 2. generate the request to the API
-* 3. Consume the response, which has our actual file location in it...
-* 4. make a 2nd rest call to add the image loc to our DB
-* 5. refresh the view
-* */
-
-
-/*
-
-
-
-function getImagesByAlbumId() {
-    fetch(_apiHost + "asdf123/images/")
-        .then(response => response.json())
-        .then((data) => {
-            console.dir(data)
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-
-function loadImagesToView() {
-    fetch(_apiHost + "asdf123/images/")
-        .then(response => response.json())
-        .then((data) => {
-            let output = '';
-            data.forEach(function(image) {
-                output += `
-                <a class="example-image-link" href="${image.location}" data-lightbox="example-set" data-title="Title: ${image.name}<br> Tag: ${image.tag}">
-                <img class="example-image" src="${image.location}" alt=""/>
-                </a>
-                `;
-            });
-            output += '</table>'
-            document.getElementById('gallery').innerHTML = output;
-
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-*/
-
-
-
-// This grabs the JSON data from rest and breaks it into a table
-/*
-window.onload = function getImagesByAlbumId(albumId) {
-    fetch(_apiHost)
-        .then(response => response.json())
-        .then((data) => {
-            let output = `
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>tag</th>
-                        <th>id</th>
-                    </tr>
-            `;
-            data.forEach(function(image) {
-                output += `
-                        <tr>
-                            <td>${image.name}</td>
-                            <td>${image.location}</td>
-                            <td>${image.tag}</td>
-                            <td>${image.id}</td>
-                        </tr>
-                `;
-            });
-            output += '</table>'
-            document.getElementById('output').innerHTML = output;
-
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-*/
