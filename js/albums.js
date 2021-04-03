@@ -1,4 +1,5 @@
-const _apiHost = 'http://localhost:8080/mcarrington1/portal/1.0.0/albums/';
+const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
+const _apiAlbum = _apiHostBase + 'album/';
 const _createAlbum = 'http://localhost:8080/mcarrington1/portal/1.0.0/album/';
 
 // On-load Operations
@@ -34,7 +35,6 @@ function loadAlbums() {
                 output += `
                 <figure class="gallery-frame">
                 <a href="thumbnails.html?${album.id}"
-                <!--https://picsum.photos/230/300?random=1-->
                     <img class="gallery-img" src="${imageLocation}" alt="${album.description}" title="${album.description}">
                     </a>
                     <figcaption>${album.name}</figcaption>
@@ -68,7 +68,7 @@ function generateAlbumThumbnail(album) {
  * @return {Object} - Response body from URL that was POSTed to
  */
 // TODO: Drop URL parameter here
-async function postFormDataAsJson({ url, formData }) {
+async function postFormDataAsJson({ formData }) {
     const plainFormData = Object.fromEntries(formData.entries());
     const formDataJsonString = JSON.stringify(plainFormData);
 
@@ -82,7 +82,7 @@ async function postFormDataAsJson({ url, formData }) {
     };
 
     console.log('Submitting JSON payload :: ' + formDataJsonString);
-    const response = await fetch(url, fetchOptions);
+    const response = await fetch(_apiAlbum, fetchOptions);
 
     if (!response.ok) {
         const errorMessage = await response.text();
@@ -109,7 +109,6 @@ async function handleFormSubmit(event) {
     event.preventDefault();
 
     const form = event.currentTarget;
-    const url = form.action; // TODO: Put the REST URL HERE
 
     try {
         const formData = new FormData(form);
