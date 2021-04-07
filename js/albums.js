@@ -52,7 +52,7 @@ function loadAlbums() {
 
 function generateAlbumThumbnail(album) {
     // look and see if album has a single image
-    if(album.images === null) {
+    if(album.images === null || album.images.length === 0) {
         console.log('no image available to populate cover, defaulting to template image')
         return './images/album-default-cover.png'
     } else {
