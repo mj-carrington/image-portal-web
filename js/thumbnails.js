@@ -20,7 +20,7 @@ window.onload = function loadView() {
     // load album data
     loadAlbumInfo();
     // Load our image list
-    loadImageGallery();
+    loadImageGallery(true);
 }
 
 function loadAlbumInfo() {
@@ -44,21 +44,22 @@ function loadAlbumInfo() {
         });
 }
 
-function loadImageGallery() {
+function loadImageGallery(willSortDescending) {
     fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
         .then((data) => {
             let output = '';
             console.dir(data);
 
-            data.forEach(function(image) {
+            let sortedData = sortImageGallery(data, willSortDescending);
+            sortedData.forEach(function(image) {
                 output += `
-            <figure class="gallery-frame">
-                <a href="image.html?${image.id}">
-                    <img class="gallery-img" src="${image.location}" alt="${image.tag}" title="${image.tag}">
-                </a>
-                <figcaption>${image.name}</figcaption>
-            </figure>
+                    <figure class="gallery-frame">
+                        <a href="image.html?${image.id}">
+                            <img class="gallery-img" src="${image.location}" alt="${image.tag}" title="${image.tag}">
+                        </a>
+                        <figcaption>${image.name}</figcaption>
+                    </figure>
             `;
             });
             document.getElementById('images').innerHTML = output;
@@ -68,6 +69,27 @@ function loadImageGallery() {
             // console.log(err)
             document.getElementById('images').innerHTML = '<h4>No Images Found.</h4>';
         });
+}
+
+/**
+ * This takes a list of images to sort them asc or desc by date attribute. Default of null will return desc.
+ * @param dataToSort data to sort
+ * @param willSortDescending default behavior of 'true' is descending here, also catches null
+ * @returns our sorted array in place
+ */
+function sortImageGallery(dataToSort, willSortDescending) {
+    if (willSortDescending || willSortDescending === null) {
+        console.log('Sorting Desc')
+        dataToSort.sort(function (a, b) {
+            return new Date(b.created) - new Date(a.created);
+        });
+    } else {
+        console.log('Sorting Asc')
+        dataToSort.sort(function (a, b) {
+            return new Date(a.created) - new Date(b.created);
+        });
+    }
+    return dataToSort;
 }
 
 
