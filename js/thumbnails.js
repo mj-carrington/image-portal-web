@@ -3,7 +3,7 @@ const _apiAlbum = _apiHostBase + 'album/';
 const _apiUpload = _apiHostBase + 'upload/';
 const _apiShare = _apiHostBase + 'share/';
 
-const albumId = location.search.substring(1);
+const albumId = new URL(location.href).searchParams.get('album');
 
 // On-Load Operations
 window.onload = function loadView() {
@@ -55,7 +55,7 @@ function loadImageGallery(willSortDescending) {
             sortedData.forEach(function(image) {
                 output += `
                     <figure class="gallery-frame">
-                        <a href="image.html?${image.id}">
+                        <a href="image.html?album=${albumId}&image=${image.id}">
                             <img class="gallery-img" src="${image.location}" alt="${image.tag}" title="${image.tag}">
                         </a>
                         <figcaption>${image.name}</figcaption>

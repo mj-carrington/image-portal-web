@@ -38,7 +38,7 @@
         </div>
         <div class="list-group list-group-flush">
 
-            <button type="button" class="btn btn-primary" onclick="returnToAlbumList()">
+            <button type="button" class="btn btn-primary" onclick="returnToThumbnailsList()">
                 <i class="fas fa-arrow-circle-left"></i>
                 Back to Album
             </button>
@@ -49,15 +49,15 @@
                 Back to Album-->
 <!--            </a>-->
             <!--            </button>-->
-            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#addImageModal">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#editImageModal">
                 <i class="fas fa-edit"></i>
                 Edit Image
             </button>
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#shareAlbumModal">
+            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#shareImageModal">
                 <i class="fas fa-share"></i>
                 Share Image
             </button>
-            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteAlbumModal">
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteImageModal">
                 <i class="fas fa-trash"></i>
                 Delete Image
             </button>
@@ -87,38 +87,39 @@
     <!-- /#page-content-wrapper -->
 
     <!-- Modals -->
-    <!-- Add Image Modal -->
-    <div class="modal" id="addImageModal">
+    <!-- Edit Image Modal -->
+    <div class="modal" id="editImageModal">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Add Image</h4>
+                    <h4 class="modal-title">Edit Image Meta-data</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->
-                <form id="upload-form">
+                <form id="edit-image-form">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="image">Album Name</label>
-                            <input type="file" name="file" class="form-control-file" id="image"
-                                   placeholder="Upload Image here">
+                            <input type="text" name="name" class="form-control-edit" id="name"
+                                   placeholder="Put a new name here">
+                            <input type="text" name="tag" class="form-control-edit" id="tag"
+                                   placeholder="Put new Tags here">
                         </div>
                     </div>
 
                     <!-- Modal footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button type="submit" class="btn btn-success">Ok</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <!-- Share Album Modal -->
-    <div class="modal" id="shareAlbumModal">
+    <!-- Share Image Modal -->
+    <div class="modal" id="shareImageModal">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -129,7 +130,7 @@
                 </div>
 
                 <!-- Modal body -->
-                <form id="share-album-form">
+                <form id="share-image-form">
                     <div class="modal-body">
                         <div class="form-group">
                             <input type="text" name="email" class="form-control-share" id="email"
@@ -146,19 +147,19 @@
             </div>
         </div>
     </div>
-    <!-- Delete Album Modal-->
-    <div class="modal" id="deleteAlbumModal">
+    <!-- Delete Image Modal-->
+    <div class="modal" id="deleteImageModal">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h4 class="modal-title">Delete Album</h4>
+                    <h4 class="modal-title">Delete Image</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->
-                <form id="delete-album-form">
+                <form id="delete-image-form">
 <!--                    <div class="modal-body">
                         <div class="form-group">
                             <input type="text" name="email" class="form-control-share" id="email"

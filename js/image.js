@@ -13,13 +13,13 @@ window.onload = function loadView() {
     loadFullImageAndMetadata();
 
     // Load our handling for form submits
-    const uploadForm = document.getElementById("upload-form");
-    uploadForm.addEventListener("submit", handleFormSubmitFile);
+    const uploadForm = document.getElementById("edit-image-form");
+    uploadForm.addEventListener("submit", handleFormSubmitImageEdit);
 
-    const shareImageForm = document.getElementById("share-album-form");
+    const shareImageForm = document.getElementById("share-image-form");
     shareImageForm.addEventListener("submit", handleFormSubmitShare);
 
-    const deleteAlbumForm = document.getElementById("delete-album-form");
+    const deleteAlbumForm = document.getElementById("delete-image-form");
     deleteAlbumForm.addEventListener("submit", handleFormSubmitDelete);
 
 }
@@ -57,17 +57,23 @@ function loadFullImageAndMetadata() {
 /**
  * Extract the id from the url and set window location to traverse back to image list
  */
-function returnToAlbumList() {
-    window.location.replace("./albums.html?album=" + albumId);
+function returnToThumbnailsList() {
+    window.location.replace("./thumbnails.html?album=" + albumId);
 }
 
 /**
- * Close all of our modals
+ * Close all modals
  */
 function closeModals() {
-    $('#shareAlbumModal').modal('hide');
+    $('#shareImageModal').modal('hide');
+    $('#editImageModal').modal('hide');
+    $('#deleteImageModal').modal('hide');
 }
 
+/**
+ * Retrieve the S3 image location for a given object
+ * @returns {Promise<[]>} Array of image locations but in this case, will be a single item in 1 array
+ */
 async function retrieveImageLocation() {
     let imageArray = [];
 
@@ -85,11 +91,15 @@ async function retrieveImageLocation() {
     return imageArray;
 }
 
-// Share Image to Album Functionality
+/**
+ * Perform REST for share image functionality
+ * @param formData extracts the e-mail address from the form
+ * @returns {Promise<void>}
+ */
 async function shareImageOperation({ formData }) {
-    let images = await retrieveImageLocation();
+    let imageUrl = await retrieveImageLocation();
     let payload = {
-        imageUrls: images,
+        imageUrls: imageUrl,
         email: formData.get('email')
     }
 
@@ -112,10 +122,9 @@ async function shareImageOperation({ formData }) {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
     }
-    closeModals();
 }
 
-async function deleteAlbumOperation() {
+async function deleteImageOperation() {
     const fetchOptions = {
         method: "DELETE",
         headers: {
@@ -124,68 +133,15 @@ async function deleteAlbumOperation() {
         }
     };
 
-    const response = await fetch(_apiAlbum + albumId, fetchOptions);
+    const response = await fetch(_apiImageUrl, fetchOptions);
 
     if (!response.ok) {
         const errorMessage = await response.text();
         throw new Error(errorMessage);
     }
-}
-
-
-// Add Image to Album Functionality
-async function addImageToAlbumOperation({ formData }) {
-    const fetchOptions = {
-        method: "POST",
-        body: formData,
-    };
-
-    console.log('Uploading image!');
-    const response = await fetch(_apiUpload, fetchOptions);
-
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage);
-    }
-
-    return response.text();
-}
-
-// TODO - Merge this with handleFormSubmitJson
-async function handleFormSubmitFile(event) {
-    event.preventDefault();
-
-    const form = event.currentTarget;
-
-    // Grab the file name before uploading
-    let fileInput = document.getElementById('image');
-    let filename = fileInput.files[0].name;
-
-    try {
-        const formData = new FormData(form);
-        for (var pair of formData.entries()) {
-            console.log(pair[0]+ ', ' + pair[1]);
-        }
-        const responseData = await addImageToAlbumOperation({ formData });
-        // console.log(responseData.text());
-
-        console.log(responseData);
-
-        // now post to the API
-        await addNewImageMetaData(filename, responseData)
-
-    } catch (error) {
-        console.error(error);
-    }
-    // Close Modal
-    $('#addImageModal').modal('hide');
-
-    // Refresh List
-    loadImageGallery();
 }
 
 async function handleFormSubmitShare(event) {
-    console.log('entering handleFormSubmitShare');
     event.preventDefault();
 
     const form = event.currentTarget;
@@ -203,8 +159,62 @@ async function handleFormSubmitShare(event) {
     } catch (error) {
         console.error(error);
     }
-    // Close Modal
-    $('#shareAlbumModal').modal('hide');
+    closeModals();
+}
+
+async function handleFormSubmitImageEdit(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+
+    try {
+        const formData = new FormData(form);
+        for (var pair of formData.entries()) {
+            console.log(pair[0]+ ', ' + pair[1]);
+        }
+        const responseData = await editImageOperation({ formData });
+        // console.log(responseData.text());
+
+        console.log(responseData);
+
+    } catch (error) {
+        console.error(error);
+    }
+
+    loadFullImageAndMetadata();
+    closeModals();
+}
+
+async function editImageOperation({ formData }) {
+
+    let payload = {};
+
+    if (formData.get('name') !== "") {
+        payload['name'] = formData.get('name');
+    }
+
+    if (formData.get('tag') !== "") {
+        payload['tag'] = formData.get('tag');
+    }
+    const formDataJsonString = JSON.stringify(payload);
+
+    const fetchOptions = {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+        },
+        body: formDataJsonString,
+    };
+
+    console.log("Submitting JSON ::");
+    console.dir(formDataJsonString);
+    const response = await fetch(_apiImageUrl, fetchOptions);
+
+    if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage);
+    }
 }
 
 async function handleFormSubmitDelete(event) {
@@ -217,7 +227,7 @@ async function handleFormSubmitDelete(event) {
         for (var pair of formData.entries()) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
-        const responseData = await deleteAlbumOperation();
+        const responseData = await deleteImageOperation();
         // console.log(responseData.text());
 
         console.log(responseData);
@@ -225,28 +235,7 @@ async function handleFormSubmitDelete(event) {
     } catch (error) {
         console.error(error);
     }
-    // Close Modal
-    $('#deleteAlbumModal').modal('hide');
 
-    // Go back to the albums list
-    returnToAlbumList();
-}
-
-async function addNewImageMetaData(imageName, imageUrl) {
-    const fetchOptions = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
-        body: JSON.stringify({name: imageName, location: imageUrl, tag: ""}),
-    };
-
-    console.dir(fetchOptions);
-    const response = await fetch(_apiAlbum + albumId + "/image/", fetchOptions);
-
-    if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage);
-    }
+    // Go back to the image list
+    returnToThumbnailsList();
 }
