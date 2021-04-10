@@ -35,7 +35,7 @@ function loadAlbums() {
                 let imageLocation = generateAlbumThumbnail(album)
                 output += `
                 <figure class="gallery-frame">
-                <a href="thumbnails.html?${album.id}">
+                <a href="thumbnails.html?album=${album.id}">
                     <img class="gallery-img" src="${imageLocation}" alt="${album.description}" title="${album.description}">
                 </a>
                     <figcaption>${album.name}</figcaption>
