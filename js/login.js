@@ -1,13 +1,20 @@
 const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
 const _apiLogin = _apiHostBase + '/user/login';
 
-// On-Load Operations
+/**
+ * Load view for listener, to submit login operation
+ */
 window.onload = function loadView() {
     // Load our handling for form submits
     const loginForm = document.getElementById("login-form");
     loginForm.addEventListener("submit", attemptLogin);
 }
 
+/**
+ * Handler for attempting login, passes along to underlying function for actual REST operation
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function attemptLogin(event) {
     event.preventDefault();
 
@@ -21,6 +28,11 @@ async function attemptLogin(event) {
     }
 }
 
+/**
+ * Execute rest call to login, populates view if incorrect or redirected to album page
+ * @param formData
+ * @returns {Promise<void>}
+ */
 async function loginOperation({ formData }) {
     let userName = formData.get('username');
     let password = formData.get('password');

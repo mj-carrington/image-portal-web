@@ -4,6 +4,9 @@ const _apiAlbums = _apiHostBase + 'albums/';
 
 
 // On-load Operations
+/**
+ * On load listen for form submissions and load album list
+ */
 window.onload = function loadAlbumList() {
     // Load our handling for form submits
     const exampleForm = document.getElementById("example-form");
@@ -13,18 +16,9 @@ window.onload = function loadAlbumList() {
     loadAlbums();
 }
 
-function loadAlbumListDebug() {
-    fetch(_apiAlbums)
-        .then(response => response.json())
-        .then((data) => {
-            console.dir(data)
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
-
-
+/**
+ * Use REST to load all album data and populate gallery view
+ */
 function loadAlbums() {
     fetch(_apiAlbums)
         .then(response => response.json())
@@ -50,10 +44,14 @@ function loadAlbums() {
         });
 }
 
+/**
+ * generate album thumbnails from an album object. Grabs the first image from the album.
+ * @param album
+ * @returns returns a default cover or first image
+ */
 function generateAlbumThumbnail(album) {
     // look and see if album has a single image
     if(album.images === null || album.images.length === 0) {
-        console.log('no image available to populate cover, defaulting to template image')
         return './images/album-default-cover.png'
     } else {
         return album.images[0].location
@@ -68,7 +66,6 @@ function generateAlbumThumbnail(album) {
  * @param {FormData} options.formData - `FormData` instance
  * @return {Object} - Response body from URL that was POSTed to
  */
-// TODO: Drop URL parameter here
 async function postFormDataAsJson({ formData }) {
     const plainFormData = Object.fromEntries(formData.entries());
     const formDataJsonString = JSON.stringify(plainFormData);
@@ -95,15 +92,10 @@ async function postFormDataAsJson({ formData }) {
 
     // Refresh List
     loadAlbums();
-
-    // return response.json();
 }
 
 /**
  * Event handler for a form submit event.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit_event
- *
  * @param {SubmitEvent} event
  */
 async function handleFormSubmit(event) {
@@ -119,7 +111,4 @@ async function handleFormSubmit(event) {
     } catch (error) {
         console.error(error);
     }
-    // Close the Modal
-    // Refresh the View
-
 }

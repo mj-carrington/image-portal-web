@@ -24,7 +24,9 @@ window.onload = function loadView() {
 
 }
 
-// Loading Image and Meta Data
+/**
+ * Populate main view of image and meta data for header from REST
+ */
 function loadFullImageAndMetadata() {
     console.log('Album Id :: ' + albumId + ' Image Id :: ' + imageId);
 
@@ -124,6 +126,10 @@ async function shareImageOperation({ formData }) {
     }
 }
 
+/**
+ * REST delete operation
+ * @returns {Promise<void>}
+ */
 async function deleteImageOperation() {
     const fetchOptions = {
         method: "DELETE",
@@ -141,6 +147,11 @@ async function deleteImageOperation() {
     }
 }
 
+/**
+ * Submit share event to REST api
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitShare(event) {
     event.preventDefault();
 
@@ -162,6 +173,11 @@ async function handleFormSubmitShare(event) {
     closeModals();
 }
 
+/**
+ * Handler for submitting images; calls to the actual REST operation
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitImageEdit(event) {
     event.preventDefault();
 
@@ -185,6 +201,11 @@ async function handleFormSubmitImageEdit(event) {
     closeModals();
 }
 
+/**
+ * Perform REST call to update image metadata
+ * @param formData
+ * @returns {Promise<void>}
+ */
 async function editImageOperation({ formData }) {
 
     let payload = {};
@@ -217,6 +238,11 @@ async function editImageOperation({ formData }) {
     }
 }
 
+/**
+ * Handler to pass along form data for REST call for deleting image
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitDelete(event) {
     event.preventDefault();
 

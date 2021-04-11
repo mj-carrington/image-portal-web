@@ -5,7 +5,9 @@ const _apiShare = _apiHostBase + 'share/';
 
 const albumId = new URL(location.href).searchParams.get('album');
 
-// On-Load Operations
+/**
+ * Listener for the various modals, loads album metadata for header and gallery of images onLoad
+ */
 window.onload = function loadView() {
     // Load our handling for form submits
     const uploadForm = document.getElementById("upload-form");
@@ -23,6 +25,9 @@ window.onload = function loadView() {
     loadImageGallery(true);
 }
 
+/**
+ * Loads album data from REST call
+ */
 function loadAlbumInfo() {
     fetch(_apiAlbum + albumId)
         .then(response => response.json())
@@ -44,6 +49,10 @@ function loadAlbumInfo() {
         });
 }
 
+/**
+ * Populates image gallery. Default is DESC order but can be triggered for ASC order of images
+ * @param willSortDescending boolean value
+ */
 function loadImageGallery(willSortDescending) {
     fetch(_apiAlbum + albumId + '/images/')
         .then(response => response.json())
@@ -92,7 +101,10 @@ function sortImageGallery(dataToSort, willSortDescending) {
     return dataToSort;
 }
 
-
+/**
+ * REST to retrieve image locations that are actually stored in S3 for sharing functionality
+ * @returns {Promise<[]>} returns an array of all the image locations
+ */
 async function retrieveImagesLocations() {
     let imageArray = [];
 
@@ -112,6 +124,11 @@ async function retrieveImagesLocations() {
     return imageArray;
 }
 
+/**
+ * Perform REST to share image. Makes an embedded REST call to fetch image locations initially
+ * @param formData - Extracts email from form submission
+ * @returns {Promise<void>}
+ */
 // Share Image to Album Functionality
 async function shareImageOperation({ formData }) {
     let images = await retrieveImagesLocations();
@@ -145,10 +162,12 @@ async function shareImageOperation({ formData }) {
 
     // Refresh List
     loadImageGallery();
-
-    // return response.json();
 }
 
+/**
+ * Perform delete REST call to remove the album. Internally service will also delete images from S3.
+ * @returns {Promise<void>}
+ */
 async function deleteAlbumOperation() {
     const fetchOptions = {
         method: "DELETE",
@@ -167,7 +186,11 @@ async function deleteAlbumOperation() {
 }
 
 
-// Add Image to Album Functionality
+/**
+ * REST call to add a new image. This is the call that uploads the image to S3.
+ * @param formData
+ * @returns {Promise<string>}
+ */
 async function addImageToAlbumOperation({ formData }) {
     const fetchOptions = {
         method: "POST",
@@ -185,7 +208,11 @@ async function addImageToAlbumOperation({ formData }) {
     return response.text();
 }
 
-// TODO - Merge this with handleFormSubmitJson
+/**
+ * This handles the addition of new images. Makes a call to upload to s3 then a call to add that metadata to MongoDB service
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitFile(event) {
     event.preventDefault();
 
@@ -218,6 +245,11 @@ async function handleFormSubmitFile(event) {
     loadImageGallery();
 }
 
+/**
+ * Submit JSON, makes an underlying call to share imaes.
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitJson(event) {
     event.preventDefault();
 
@@ -229,7 +261,6 @@ async function handleFormSubmitJson(event) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
         const responseData = await shareImageOperation({ formData });
-        // console.log(responseData.text());
 
         console.log(responseData);
 
@@ -243,6 +274,11 @@ async function handleFormSubmitJson(event) {
     loadImageGallery();
 }
 
+/**
+ * Handler to deal with deleting the album.
+ * @param event
+ * @returns {Promise<void>}
+ */
 async function handleFormSubmitDelete(event) {
     event.preventDefault();
 
@@ -254,8 +290,6 @@ async function handleFormSubmitDelete(event) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
         const responseData = await deleteAlbumOperation();
-        // console.log(responseData.text());
-
         console.log(responseData);
 
     } catch (error) {
@@ -268,6 +302,12 @@ async function handleFormSubmitDelete(event) {
     window.location.replace("./albums.html");
 }
 
+/**
+ * Makes a rest call to add the underlying meta data *after* an image is added to S3.
+ * @param imageName this is taken from the form data that the user uploaded with
+ * @param imageUrl this url is taken from what the UPLOAD api request gives us, since the filename will be different every time.
+ * @returns {Promise<void>}
+ */
 async function addNewImageMetaData(imageName, imageUrl) {
     const fetchOptions = {
         method: "POST",
