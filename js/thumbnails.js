@@ -150,7 +150,9 @@ async function shareImageOperation({ formData }) {
 
     console.log("Submitting JSON ::");
     console.dir(formDataJsonString);
+
     const response = await fetch(_apiShare, fetchOptions);
+    console.log('Data Retrieved back from Share API: ' + response);
 
     if (!response.ok) {
         const errorMessage = await response.text();

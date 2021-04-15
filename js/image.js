@@ -163,9 +163,7 @@ async function handleFormSubmitShare(event) {
             console.log(pair[0]+ ', ' + pair[1]);
         }
         const responseData = await shareImageOperation({ formData });
-        // console.log(responseData.text());
-
-        console.log(responseData);
+        console.log('Data Retrieved back from Share API: ' + responseData);
 
     } catch (error) {
         console.error(error);
