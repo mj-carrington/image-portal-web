@@ -1,6 +1,8 @@
 body {
     font-family: "Merriweather Sans", sans-serif;
     color: black;
+    background-image: url("../images/double-bubble-outline.png");
+    background-repeat: repeat;
 }
 
 .fa-gradient {

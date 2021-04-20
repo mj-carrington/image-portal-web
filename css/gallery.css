@@ -1,4 +1,4 @@
-/* First the Grid */
+/* Grid */
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -17,19 +17,13 @@
     background-color: #013636;
     color: #d9d9d9;
     border-radius: 25px;
-    /*height: 300px;*/
-    /*width: 300px;*/
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 /* The Images */
 .gallery-img {
-    /*max-width: 100%;*/
-    /*height: 300px;*/
     height: 250px;
     width: 250px;
-    /*max-height: 100%;*/
-    /*max-width: 30%;*/
-    /*height: auto;*/
     object-fit: scale-down;
     transition: opacity 0.25s ease-in-out;
     border-radius: 25px;
