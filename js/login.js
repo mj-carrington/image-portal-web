@@ -1,5 +1,5 @@
-const _apiHostBase = 'http://localhost:8080/mcarrington1/portal/1.0.0/'
-const _apiLogin = _apiHostBase + '/user/login';
+const _apiHostBase = 'http://imageportalservice-env.eba-nqjzvchk.us-east-1.elasticbeanstalk.com/mcarrington1/portal/1.0.0/'
+const _apiLogin = _apiHostBase + 'user/login';
 
 /**
  * Load view for listener, to submit login operation
